@@ -2,13 +2,10 @@
 
 ## Project Overview
 
-This project documents a security assessment I performed on my own WPA2 wireless network using Kali Linux.
-
-The assessment focused on examining the network's security configuration, testing its resistance to deauthentication attacks, capturing and analyzing the WPA2 four-way handshake, and demonstrating offline password recovery using GPU acceleration.
-
-I also examined encrypted wireless traffic in Wireshark to understand what information remains visible without access to the encryption keys.
-
-All active testing was conducted against my own router and test device.
+- **Network:** A personally owned WPA2 wireless network, assessed using Kali Linux.
+- **Assessment:** Review of the security configuration, deauthentication resistance, WPA2 handshake capture and analysis, and offline password verification using GPU acceleration.
+- **Traffic analysis:** Wireshark review of metadata visible without the decryption keys.
+- **Authorization:** Active testing was limited to the router and test device.
 
 ## Objectives
 
@@ -38,45 +35,31 @@ All active testing was conducted against my own router and test device.
 - **hcxtools:** WPA2 handshake conversion
 - **Hashcat:** GPU-accelerated offline password testing
 
-
 ## Testing Methodology
 
 ### 1. Wireless Network Reconnaissance
 
-I used Airodump-ng to identify my wireless network and examine its security configuration.
-
-The assessment was conducted on the 2.4 GHz network operating on channel 9, using WPA2-PSK with CCMP encryption.
-
-I then examined the access point's beacon frames in Wireshark to check its Protected Management Frame (PMF) capabilities.
+- **Network discovery:** Airodump-ng identified the wireless network and its security configuration.
+- **Configuration:** The assessment targeted the 2.4 GHz network on channel 9, configured with WPA2-PSK and CCMP encryption.
+- **PMF review:** The access point's beacon frames were examined in Wireshark for advertised Protected Management Frame (PMF) capabilities.
 
 ### 2. Deauthentication Testing and Handshake Capture
 
-After confirming that the access point did not advertise PMF capability in the tested configuration, I performed a controlled deauthentication test against my own smartphone.
-
-Using Aireplay-ng, I transmitted one targeted deauthentication burst while Airodump-ng monitored the network.
-
-The phone disconnected and subsequently reconnected. During the reconnection, I successfully captured the WPA2 four-way handshake.
-
-I examined the capture in Wireshark and identified all four EAPOL-Key messages.
+- **PMF configuration:** The access point did not advertise PMF capability in the tested configuration.
+- **Test:** One targeted deauthentication burst was transmitted against the test smartphone while Airodump-ng monitored the network.
+- **Outcome:** The phone disconnected and reconnected. The WPA2 four-way handshake was captured during reconnection, and all four EAPOL-Key messages were identified in Wireshark.
 
 ### 3. Offline Password Recovery
 
-I converted the captured WPA2 handshake into Hashcat's HC22000 format using `hcxpcapngtool`.
-
-I then used Hashcat with GPU acceleration and a prepared RockYou-based dictionary to demonstrate offline WPA2 password verification.
-
-The test was performed locally using an NVIDIA RTX 4050 Laptop GPU, without sending additional authentication requests to the router.
+- **Conversion:** The captured handshake was converted to Hashcat's HC22000 format using `hcxpcapngtool`.
+- **Dictionary test:** Hashcat tested candidates offline with GPU acceleration and a prepared RockYou-based wordlist.
+- **Execution:** The test ran locally on an NVIDIA RTX 4050 Laptop GPU and required no additional authentication requests to the router.
 
 ### 4. WPA2 Encryption and Traffic Analysis
 
-I examined protected 802.11 Data frames in Wireshark to understand how WPA2-CCMP handles different types of traffic.
-
-I compared unicast and broadcast frames, including their destination addresses and CCMP Key Index values.
-
-I also tested whether Wireshark could decode IP packets inside protected frames without the required decryption keys.
-
-Finally, I used Wireshark's I/O Graphs to examine packet rates and traffic patterns that remained observable despite wireless encryption.
-
+- **Frame analysis:** Protected 802.11 Data frames were compared in Wireshark to review pairwise and group encryption, destination addresses, and CCMP Key Index values.
+- **IP filter:** A Wireshark display filter checked for decoded IP packets within protected frames.
+- **Traffic patterns:** Wireshark's I/O Graphs were used to review packet rates and activity visible despite wireless encryption.
 
 ## Results and Evidence
 
@@ -84,16 +67,16 @@ Finally, I used Wireshark's I/O Graphs to examine packet rates and traffic patte
 
 The access point was configured to use WPA2-PSK with CCMP encryption.
 
-While examining its beacon frames in Wireshark, I found that the access point did not advertise Protected Management Frame (PMF) capability in the tested configuration.
+Wireshark analysis of its beacon frames showed that the access point did not advertise Protected Management Frame (PMF) capability in the tested configuration.
 
 The RSN Capabilities showed:
 
 - **MFPC:** 0 (Not Capable)
 - **MFPR:** 0 (Not Required)
 
-I had previously observed the same configuration on the router's 5 GHz network.
+The same configuration had previously been observed on the router's 5 GHz network.
 
-The absence of PMF means that connected devices do not benefit from its protection against forged deauthentication and disassociation frames.
+Without PMF, connected devices lack its protection against forged deauthentication and disassociation frames.
 
 A detailed explanation of this finding, including its security impact and recommendations, is available in [Security Findings](notes/findings.md).
 
@@ -101,7 +84,7 @@ A detailed explanation of this finding, including its security impact and recomm
 
 ### 2. Deauthentication and Handshake Capture
 
-I performed a targeted deauthentication test against my own smartphone while monitoring the access point using Airodump-ng.
+A targeted deauthentication test was conducted against the test smartphone while Airodump-ng monitored the access point.
 
 **Results:**
 
@@ -110,19 +93,19 @@ I performed a targeted deauthentication test against my own smartphone while mon
 - Client reconnection: Successful
 - WPA2 four-way handshake: Captured successfully
 
-The capture was examined in Wireshark, where I identified all four EAPOL-Key messages.
+Wireshark showed all four EAPOL-Key messages in the capture.
 
-The capture also contained multiple retransmissions of Message 1 before the client responded. Further analysis of these retransmissions was outside the scope of this experiment.
+The capture also contained multiple retransmissions of Message 1 before the client responded. Retransmission behavior was not analyzed further in this experiment.
 
-The test demonstrated that a forged deauthentication attempt could disrupt the connection of the tested client and trigger a new WPA2 handshake.
+The test showed that the targeted deauthentication attempt disconnected the test client and triggered a new WPA2 handshake.
 
 ![Four WPA2 handshake messages in Wireshark](evidence/handshake.png)
 
 ### 3. Offline WPA2 Password Recovery
 
-I used `hcxpcapngtool` to extract the captured handshake information into Hashcat's HC22000 format.
+The captured handshake was converted to Hashcat's HC22000 format with `hcxpcapngtool`.
 
-Hashcat was then used to perform an offline dictionary attack with GPU acceleration.
+Hashcat performed an offline dictionary attack with GPU acceleration.
 
 **Results:**
 
@@ -139,16 +122,15 @@ Hashcat was then used to perform an offline dictionary attack with GPU accelerat
 | Attack Runtime | Approximately 41 seconds |
 | Password Recovery | Successful |
 
-The test demonstrated how password candidates can be verified against a captured WPA2 handshake without further communication with the access point.
+The test verified password candidates against the captured WPA2 handshake without further communication with the access point.
 
-The experiment used a prepared dictionary containing the test credential. The successful result therefore demonstrates offline verification rather than independent discovery of an unknown password.
+The prepared dictionary included the test credential, so this result demonstrates offline verification rather than recovery of an unknown password.
 
 ![Hashcat offline password verification results](evidence/hashcatresults.png)
 
 ### 4. WPA2 Encryption and Traffic Analysis
 
-I examined protected 802.11 Data frames in Wireshark to compare pairwise and group encryption.
-
+Protected 802.11 Data frames were examined in Wireshark to compare pairwise and group encryption.
 
 **Observed results:**
 
@@ -160,17 +142,13 @@ I examined protected 802.11 Data frames in Wireshark to compare pairwise and gro
 | Key Type | Pairwise Temporal Key | Group Temporal Key |
 | Protected Frame | Yes | Yes |
 
-I also applied a display filter combining protected 802.11 Data frames with the IP protocol.
+A display filter for protected 802.11 Data frames and IP traffic returned **0 matching packets**. No IP packets were decoded from the protected frames in this capture.
 
-Wireshark returned **0 matching packets** for that filter in this capture. This is consistent with the protected payloads remaining undecoded in that session. The filter result alone does not establish whether those payloads contained IP traffic.
+The traffic was also reviewed using Wireshark's I/O Graphs.
 
-Finally, I examined the traffic using Wireshark's I/O Graphs.
+Packet activity was relatively low early in the capture and increased after the client's reconnection. The peak observed rate was approximately **300 packets per second**.
 
-The graph showed relatively little activity during the early part of the capture, followed by noticeable increases in packet volume after the client's reconnection.
-
-The highest observed rate was approximately **300 packets per second**.
-
-Although WPA2-CCMP protects the contents of wireless data frames, information such as MAC addresses, frame sizes, packet timing and traffic volume remains observable.
+Although WPA2-CCMP protects the contents of wireless data frames, MAC addresses, frame sizes, packet timing and traffic volume remain observable.
 
 #### Encrypted Traffic Analysis — Wireshark I/O Graph
 
@@ -178,31 +156,23 @@ Although WPA2-CCMP protects the contents of wireless data frames, information su
 
 The graph shows the packet rate of protected 802.11 Data frames involving the test client, measured at one-second intervals.
 
-
 ## Conclusion
 
-This assessment helped me examine WPA2 security beyond its basic authentication and encryption mechanisms.
-
-The main security concern identified was the absence of PMF capability in the tested configuration. During controlled testing, a targeted deauthentication attempt successfully disconnected my test device, allowing me to capture and analyze a new WPA2 four-way handshake.
-
-I also demonstrated offline password verification using Hashcat and examined how WPA2-CCMP protects wireless traffic. While the encrypted payloads could not be decoded without the necessary keys, information such as MAC addresses, packet sizes and transmission patterns remained visible.
-
-Overall, the project demonstrated how wireless security depends on more than encryption alone. Management-frame protection, password strength and network configuration also play important roles.
+The tests showed that the access point did not advertise PMF and that a targeted deauthentication burst disconnected the test phone before it reconnected. The captured handshake was then used to check the prepared test password offline. Without the decryption keys, Wireshark could not show the protected payloads, but MAC addresses, frame sizes, timing and traffic volume remained visible.
 
 ## Limitations
 
 - The assessment was conducted on a single home router and personal test device.
 - Deauthentication testing was limited to a controlled experiment, so the results may differ with other devices and network configurations.
-- The offline dictionary experiment used a prepared wordlist containing the test credential.
+- The network was intentionally configured with a test password included in the wordlist to demonstrate offline password recovery in the lab.
 - The traffic analysis focused on observable wireless metadata rather than decrypting application traffic.
 - The assessment did not cover WPA3-SAE, enterprise authentication or other wireless security configurations.
 
 ## Security Recommendations
 
-Based on the assessment, the following measures are recommended:
+The following changes would improve the network's security:
 
 - Enable PMF where supported, preferably in Required mode when compatible with connected devices.
 - Use a strong, unique Wi-Fi passphrase to reduce the effectiveness of offline password-guessing attacks.
 - Consider WPA3-Personal where supported.
 - Keep router firmware updated and periodically review wireless security settings.
-

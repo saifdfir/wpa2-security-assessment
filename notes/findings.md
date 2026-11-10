@@ -2,7 +2,7 @@
 
 ## Finding 01: Protected Management Frames (PMF) Not Advertised as Capable
 
-### 1.Description/Observation
+### 1. Description / Observation
 
 While analyzing the router's beacon frames in Wireshark, I found that Protected Management Frame (PMF) capability was not advertised on the 2.4 GHz network in the tested configuration.
 
@@ -16,7 +16,7 @@ The observed configuration was:
 
 I had previously observed the same PMF settings on the router's 5 GHz network.
 
-### 2.Evidence
+### 2. Evidence
 
 The finding was identified by examining the RSN Capabilities field in an 802.11 beacon frame captured using Wireshark.
 
@@ -27,7 +27,7 @@ The relevant fields showed:
 
 [Redacted screenshot of the beacon's RSN Capabilities](../evidence/pmf-capabilities.png).
 
-### 3.Security Impact
+### 3. Security Impact
 
 Without PMF, the network does not provide cryptographic protection against forged deauthentication and disassociation frames.
 
@@ -35,7 +35,7 @@ An attacker within wireless range could potentially impersonate the access point
 
 The beacon evidence establishes that PMF capability was not advertised in the tested configuration. It does not, by itself, confirm that a deauthentication attempt would successfully disconnect a client.
 
-### 4.Risk Rating
+### 4. Risk Rating
 
 **Preliminary Severity: Medium**
 

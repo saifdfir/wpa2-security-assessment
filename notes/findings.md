@@ -33,17 +33,17 @@ Without PMF, the network does not provide cryptographic protection against forge
 
 An attacker within wireless range could potentially impersonate the access point and transmit forged management frames to disrupt a connected device's Wi-Fi connection.
 
-The beacon evidence establishes that PMF capability was not advertised in the tested configuration. It does not, by itself, confirm that a deauthentication attempt would successfully disconnect a client.
+The beacon evidence establishes that PMF capability was not advertised in the tested configuration. In the separate controlled test described in the [assessment results](../README.md#2-deauthentication-and-handshake-capture), one targeted deauthentication burst disconnected the test smartphone, which then reconnected. This observation applies to the tested client and configuration.
 
 ### 4. Risk Rating
 
-**Preliminary Severity: Medium**
+**Assessed severity: Medium (availability impact in this lab)**
 
 The lack of PMF may expose connected devices to wireless denial-of-service attacks involving forged management frames.
 
 However, this finding primarily concerns connection availability rather than direct exposure of encrypted network traffic or passwords.
 
-The severity is preliminary and may be revised based on controlled testing, client behavior and the importance of uninterrupted connectivity in the assessed environment.
+The rating reflects the observed disruption of one client. The impact in another environment depends on client behavior and the importance of uninterrupted connectivity.
 
 ### 5. Recommendation
 
@@ -54,3 +54,4 @@ Where client compatibility allows, configure PMF in Required mode to ensure conn
 If supported, WPA3-Personal is another option, as it requires PMF.
 
 After making any configuration changes, verify the advertised RSN capabilities and confirm that connected devices negotiate PMF successfully.
+

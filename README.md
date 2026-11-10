@@ -133,9 +133,9 @@ Hashcat was then used to perform an offline dictionary attack with GPU accelerat
 | Attack Mode | Straight Dictionary Attack |
 | Hash Mode | 22000 |
 | Wordlist | RockYou-based test dictionary |
-| Dictionary Entries Processed | 14,344,386 |
+| Candidate progress, including rejected candidates | 14,344,386 / 14,344,386 |
 | Rejected Candidates | 4,734,913 |
-| Average Testing Speed | 234.8 kH/s |
+| Reported testing speed at completion | 234.8 kH/s |
 | Attack Runtime | Approximately 41 seconds |
 | Password Recovery | Successful |
 
@@ -162,7 +162,7 @@ I examined protected 802.11 Data frames in Wireshark to compare pairwise and gro
 
 I also applied a display filter combining protected 802.11 Data frames with the IP protocol.
 
-Wireshark returned **0 matching packets**, indicating that it could not decode the encrypted payloads as IP traffic without the necessary decryption keys.
+Wireshark returned **0 matching packets** for that filter in this capture. This is consistent with the protected payloads remaining undecoded in that session. The filter result alone does not establish whether those payloads contained IP traffic.
 
 Finally, I examined the traffic using Wireshark's I/O Graphs.
 
@@ -183,7 +183,7 @@ The graph shows the packet rate of protected 802.11 Data frames involving the te
 
 This assessment helped me examine WPA2 security beyond its basic authentication and encryption mechanisms.
 
-The main security concern identified was the lack of Protected Management Frame (PMF) support. During controlled testing, a targeted deauthentication attempt successfully disconnected my test device, allowing me to capture and analyze a new WPA2 four-way handshake.
+The main security concern identified was the absence of PMF capability in the tested configuration. During controlled testing, a targeted deauthentication attempt successfully disconnected my test device, allowing me to capture and analyze a new WPA2 four-way handshake.
 
 I also demonstrated offline password verification using Hashcat and examined how WPA2-CCMP protects wireless traffic. While the encrypted payloads could not be decoded without the necessary keys, information such as MAC addresses, packet sizes and transmission patterns remained visible.
 
@@ -205,3 +205,4 @@ Based on the assessment, the following measures are recommended:
 - Use a strong, unique Wi-Fi passphrase to reduce the effectiveness of offline password-guessing attacks.
 - Consider WPA3-Personal where supported.
 - Keep router firmware updated and periodically review wireless security settings.
+
